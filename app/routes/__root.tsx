@@ -114,13 +114,16 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
                 </div>
               </SignedOut>
               <SignedIn>
-                <UserButton showName appearance={{
-                  elements: {
-                    userButtonOuterIdentifier: {
-                      color: 'white',
-                    }
-                  }
-                }} />
+                <UserButton 
+                  showName 
+                  appearance={{
+                    elements: {
+                      userButtonOuterIdentifier: {
+                        color: 'white',
+                      },
+                    },
+                  }}
+                />
               </SignedIn>
             </div>
           </nav>
