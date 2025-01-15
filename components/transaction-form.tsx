@@ -1,4 +1,9 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Form, useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form'
+import { Select, SelectItem, SelectTrigger } from './ui/select'
+import { SelectContent, SelectValue } from '@radix-ui/react-select'
 
 const transactionFormSchema = z.object({
   transactionType: z
@@ -19,5 +24,45 @@ const transactionFormSchema = z.object({
 })
 
 export function TransactionForm() {
-  return <div>Transaction Form</div>
+  const form = useForm<z.infer<typeof transactionFormSchema>>({
+    resolver: zodResolver(transactionFormSchema),
+    defaultValues: {
+      transactionType: 'income',
+      amount: 0,
+      categoryId: 0,
+      description: '',
+      taransactionDate: new Date(),
+    }
+  })
+  return <Form {...form}>
+    <form>
+      <fieldset className='grid grid-cols-2 gap-y-5 gap-x-2'>
+        <FormField
+          control={form.control}
+          name='transactionType'
+          render={({ field }) => {
+            return(
+              <FormItem>
+                <FormLabel>
+                  Transaction Type
+                </FormLabel>
+                <FormControl>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder='Transaction Type' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value='income'>Income</SelectItem>
+                      <SelectItem value='expense'>Expense</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )
+          }}
+        />
+      </fieldset>
+    </form>
+  </Form>
 }
