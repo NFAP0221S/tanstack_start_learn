@@ -11,6 +11,7 @@ import { format } from 'date-fns'
 import { Calendar } from './ui/calendar'
 import { CalendarIcon } from 'lucide-react'
 import { Input } from './ui/input'
+import { categoriesTable } from '@/db/schema'
 
 const transactionFormSchema = z.object({
   transactionType: z
@@ -30,7 +31,11 @@ const transactionFormSchema = z.object({
     .max(300, 'Description must contain a maximum of 300 characters')
 })
 
-export function TransactionForm() {
+export function TransactionForm({
+  categories,
+}: {
+  categories: (typeof categoriesTable.$inferSelect)[]
+}) {
 
   const form = useForm<z.infer<typeof transactionFormSchema>>({
     resolver: zodResolver(transactionFormSchema),
@@ -46,6 +51,8 @@ export function TransactionForm() {
   const handleSubmit = (data: z.infer<typeof transactionFormSchema>) => {
     console.log({data})
   }
+
+  const filteredCategories = categories.filter(cat => cat.type === form.getValues('transactionType'))
 
   return <Form {...form}>
     <form onSubmit={form.handleSubmit(handleSubmit)}>
@@ -93,6 +100,11 @@ export function TransactionForm() {
                       <SelectValue placeholder='Transaction Type' />
                     </SelectTrigger>
                     <SelectContent>
+                      {filteredCategories.map((category) => (
+                        <SelectItem key={category.id} value={category.id.toString()}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </FormControl>
