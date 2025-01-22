@@ -7,13 +7,13 @@ import { SelectContent, SelectValue } from '@radix-ui/react-select'
 import { Popover, PopoverContent, PopoverTrigger } from '@radix-ui/react-popover'
 import { Button } from './ui/button'
 import { cn } from '@/lib/utils'
-import { format } from 'date-fns'
+import { addDays, format } from 'date-fns'
 import { Calendar } from './ui/calendar'
 import { CalendarIcon } from 'lucide-react'
 import { Input } from './ui/input'
 import { categoriesTable } from '@/db/schema'
 
-const transactionFormSchema = z.object({
+export const transactionFormSchema = z.object({
   transactionType: z
     .enum(['income', 'expense']),
   categoryId: z
@@ -21,7 +21,7 @@ const transactionFormSchema = z.object({
     .positive('Please select a category'),
   transactionDate: z
     .date()
-    .max(new Date(), 'Transaction date cannot be in the future'),
+    .max(addDays(new Date(), 1), 'Transaction date cannot be in the future'),
   amount: z
     .coerce.number()
     .positive('Amount must be greater than 0'),
@@ -33,8 +33,10 @@ const transactionFormSchema = z.object({
 
 export function TransactionForm({
   categories,
+  onSubmit,
 }: {
   categories: (typeof categoriesTable.$inferSelect)[]
+  onSubmit: (data: z.infer<typeof transactionFormSchema>) => Promise<void>
 }) {
 
   const form = useForm<z.infer<typeof transactionFormSchema>>({
@@ -55,7 +57,7 @@ export function TransactionForm({
   const filteredCategories = categories.filter(cat => cat.type === form.getValues('transactionType'))
 
   return <Form {...form}>
-    <form onSubmit={form.handleSubmit(handleSubmit)}>
+    <form onSubmit={form.handleSubmit(onSubmit)}>
       <fieldset 
         className='grid grid-cols-2 gap-y-5 gap-x-2'
         disabled={form.formState.isSubmitting}
